@@ -9,12 +9,27 @@
 
 ;; Tested against the python rfc6979 ns result for:
 ;; >>> generate_k(order, priv, hashlib.sha256, b"sample")
+;; >>> generate_k(order, priv, hashlib.sha256, b"sample", extra_entropy=b"seed")
 (deftest generate-ks-test
-  (testing "`k` generation for message 'sample'"
-    (= (first
-         (generate-ks
-           {:curve-order order
-            :private-key priv
-            :data        (.getBytes "sample")
-            :hash-digest (sha-256-digest)}))
-       93987516925140233289636602974981363253087044111722771293)))
+  (testing "vanilla rfc6979 k generation without extra entropy"
+    (is
+      (= (first
+           (generate-ks
+             {:curve-order order
+              :private-key priv
+              :data        (.getBytes "sample")
+              :hash-digest (sha-256-digest)}))
+         93987516925140233289636602974981363253087044111722771293)
+      "`k` generation for message 'sample'"))
+
+  (testing "section 3.6 rfc6979 k generation with extra entropy (k prime)"
+    (is
+      (= (first
+           (generate-ks
+             {:curve-order order
+              :private-key priv
+              :data        (.getBytes "sample")
+              :hash-digest (sha-256-digest)
+              :extra-entropy (.getBytes "seed")}))
+         1976315346348424951535402330023639247709696865529252022598)
+      "`k` generation for message 'sample' with entropy 'seed'")))

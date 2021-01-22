@@ -1,6 +1,6 @@
 (ns io.sixtant.rfc6979
   (:import (org.bouncycastle.crypto.digests SHA256Digest)
-           (org.bouncycastle.crypto.signers HMacDSAKCalculator)))
+           (io.sixtant RFC6979)))
 
 
 (defn sha-256-digest
@@ -19,15 +19,20 @@
     - private-key   Private key as a BigInteger.
     - data          Byte array of hashed message data (for signing).
     - hash-digest   An instance of org.bouncycastle.crypto.Digest specifying the
-                    hash function to use (see `sha-256-digest` in this ns)."
+                    hash function to use (see `sha-256-digest` in this ns).
+  Optional
+    - extra-entropy A k' value as described in section 3.6 of rfc6979, and
+                    as implemented in rfc6979.py."
   [{:keys [^BigInteger curve-order
            ^BigInteger private-key
            ^bytes data
-           ^org.bouncycastle.crypto.Digest hash-digest]}]
+           ^org.bouncycastle.crypto.Digest hash-digest
+           ^bytes extra-entropy]}]
   (let [calculator (doto
-                     (HMacDSAKCalculator. hash-digest)
+                     (RFC6979. hash-digest)
                      (.init
                        curve-order
                        private-key
-                       data))]
+                       data
+                       (or extra-entropy (byte-array []))))]
     (repeatedly #(.nextK calculator))))
