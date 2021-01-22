@@ -6,6 +6,11 @@
 signature scheme in Clojure — with support for a `k'` parameter as a source of 
 extra entropy as described under ["Variants" (section 3.6)](https://tools.ietf.org/html/rfc6979#section-3.6).
 
+Available as:
+```
+[io.sixtant/rfc6979 "0.1.0"]
+```
+
 ## Usage
 
 ### Generating Deterministic K Values
